@@ -1,0 +1,1383 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AirCarbon Api",
+    "description": "## Overview\n\nAirCarbon API provides a simple way for traders to manage their order/trades and other related",
+    "version": "1.0",
+    "x-logo": {
+      "url": "https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/w7q0ggrl8cfalc8yn4h3"
+    }
+  },
+  "host": "http://test.exmple:3030",
+  "basePath": "/v2",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/api/account/open-balance": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get Open Balance",
+        "description": "Get open balance details for a user",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Object contains detailed open balance for a user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenBalance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "security": {
+      "0": {
+        "x-api-key": []
+      }
+    },
+    "/api/order/": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Place Order",
+        "description": "Place new order",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User API key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created order object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Price decimal exceed limit or price to far from market"
+          },
+          "403": {
+            "description": "Quantity or price not valid"
+          },
+          "404": {
+            "description": "Requested pair (pairId) not found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "User Orders",
+        "description": "List user orders per pair",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "pair",
+            "in": "query",
+            "description": "Pair name (ANT/USD)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus",
+              "description": "Order status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Orders"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/order/{orderId}/cancel": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Cancel Order",
+        "description": "Cancel order by id",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "description": "Order id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Requested order not exist"
+          },
+          "406": {
+            "description": "Requested order not in open status"
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "User Trades",
+        "description": "List user trades per pair",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "pair",
+            "in": "query",
+            "description": "Pair name (ANT/USD)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Trade status",
+            "schema": {
+              "$ref": "#/components/schemas/TradeStatus",
+              "description": "Trade status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trades",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trades"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/all": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "Trades",
+        "description": "List of all trades per pair",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "pair",
+            "in": "query",
+            "description": "Pair name (ANT/USD)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page (for pagination)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Trade status",
+            "schema": {
+              "$ref": "#/components/schemas/TradeStatus",
+              "description": "Trade status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trades",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trades"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/order-book": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "Orderbook",
+        "description": "Order book per pair",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "pairId",
+            "in": "query",
+            "description": "Pair id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page (for pagination)",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order book",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderBook"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/fee": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "Trade Fee",
+        "description": "Get trade fee",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "account",
+            "in": "query",
+            "description": "User account address",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Trade type",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TradeType"
+            }
+          },
+          {
+            "name": "qty",
+            "in": "query",
+            "description": "Trade quantity",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tokenId",
+            "in": "query",
+            "description": "Trade token id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "description": "Trade total amount",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trade Fee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeFee"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/token-price": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "Token Price",
+        "description": "Get trade token price",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          },
+          {
+            "name": "pairId",
+            "in": "query",
+            "description": "Pair id",
+            "required": true
+          },
+          {
+            "name": "tokenId",
+            "in": "query",
+            "description": "token id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Trade type",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TradeType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Object contains trade token price",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeTokenPrice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing parameter)"
+          }
+        }
+      }
+    },
+    "/api/trade/watchlist": {
+      "get": {
+        "tags": [
+          "Trade"
+        ],
+        "summary": "Watchlist",
+        "description": "Watchlist",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "User API key",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserApiKey",
+              "description": "User api key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Watchlist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Watchlist"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "openapi": {
+      "0": "3",
+      "1": ".",
+      "2": "0",
+      "3": ".",
+      "4": "0"
+    },
+    "info": {
+      "title": "Converted from trade.swagger.yaml with typeconv",
+      "version": "1",
+      "x-id": "trade.swagger.yaml",
+      "x-comment": "Generated from models/trade.ts by core-types-json-schema (https://github.com/grantila/core-types-json-schema) on behalf of typeconv (https://github.com/grantila/typeconv)"
+    }
+  },
+  "components": {
+    "schemas": {
+      "Sides": {
+        "type": "object",
+        "properties": {
+          "sideId": {
+            "type": "string",
+            "example": "BUY",
+            "title": "Sides.sideId"
+          }
+        },
+        "required": [
+          "sideId"
+        ],
+        "additionalProperties": false,
+        "title": "Sides"
+      },
+      "TradeFee": {
+        "type": "object",
+        "properties": {
+          "fee": {
+            "type": "number",
+            "example": 5
+          }
+        }
+      },
+      "UserApiKey": {
+        "type": "string",
+        "examples": "dsdsfs-fsfsfsfs-fsfsfs"
+      },
+      "OrderDetails": {
+        "type": "object",
+        "properties": {
+          "pairId": {
+            "type": "number",
+            "example": 2
+          },
+          "sideId": {
+            "type": "string",
+            "example": "Sell"
+          },
+          "timeInForceTypeId": {
+            "type": "number",
+            "example": 3
+          },
+          "expiryUtc": {
+            "type": "date-time",
+            "example": null
+          },
+          "typeId": {
+            "type": "string",
+            "example": "Limit"
+          },
+          "price": {
+            "type": "number",
+            "example": 1.2
+          },
+          "qty": {
+            "type": "number",
+            "example": 2000
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "pairId": {
+            "type": "number",
+            "example": 2,
+            "title": "Order.pairId"
+          },
+          "sideId": {
+            "type": "number",
+            "example": 2,
+            "title": "Order.sideId"
+          },
+          "timeInForceTypeId": {
+            "type": "number",
+            "example": 3,
+            "title": "Order.timeInForceTypeId"
+          },
+          "expiryUtc": {
+            "type": "date-time",
+            "example": null,
+            "title": "Order.expiryUtc"
+          },
+          "typeId": {
+            "type": "number",
+            "example": 2,
+            "title": "Order.typeId"
+          },
+          "price": {
+            "type": "number",
+            "example": 1.2,
+            "title": "Order.price"
+          },
+          "qty": {
+            "type": "number",
+            "example": 2000,
+            "title": "Order.qty"
+          },
+          "userId": {
+            "type": "number",
+            "example": 2634,
+            "title": "Order.userId"
+          },
+          "accountAddress": {
+            "type": "number",
+            "example": 9.325889355704871e+47,
+            "title": "Order.accountAddress"
+          },
+          "tradeFee": {
+            "type": "number",
+            "example": 5,
+            "title": "Order.tradeFee"
+          },
+          "processed": {
+            "type": "number",
+            "example": 0,
+            "title": "Order.processed"
+          },
+          "statusId": {
+            "type": "number",
+            "example": 14,
+            "title": "Order.statusId"
+          },
+          "sourceId": {
+            "type": "number",
+            "example": 1,
+            "title": "Order.sourceId"
+          },
+          "createdAtUtc": {
+            "type": "date-time",
+            "example": "2022-04-27T14:38:36.000Z",
+            "title": "Order.createdAtUtc"
+          },
+          "lastActionAtUtc": {
+            "type": "date-time",
+            "example": "2022-04-27T14:38:36.000Z",
+            "title": "Order.lastActionAtUtc"
+          },
+          "fixClientOrderId": {
+            "type": "number",
+            "example": null,
+            "title": "Order.fixClientOrderId"
+          },
+          "id": {
+            "type": "number",
+            "example": 21403,
+            "title": "Order.id"
+          },
+          "__pair__": {
+            "$ref": "#/components/schemas/Pair",
+            "title": "Order.__pair__"
+          },
+          "__orderSide__": {
+            "$ref": "#/components/schemas/OrderSide",
+            "title": "Order.__orderSide__"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "__pair__",
+          "__orderSide__",
+          "typeId",
+          "price",
+          "qty",
+          "userId",
+          "accountAddress",
+          "tradeFee",
+          "processed",
+          "statusId",
+          "sourceId",
+          "createdAtUtc",
+          "lastActionAtUtc",
+          "fixClientOrderId",
+          "id"
+        ],
+        "additionalProperties": false,
+        "title": "Order",
+        "description": "@swagger components:\n  schemas:\n    OrderDetails:\n      type: object\n      properties:\n        pairId:\n           type: number\n           example: 2\n        sideId:\n           type: string\n           example: Sell\n        timeInForceTypeId:\n           type: number\n           example: 3\n        expiryUtc:\n           type: date-time\n           example: null\n        typeId:\n           type: string\n           example: Limit\n        price:\n          type: number\n          example: 1.2\n        qty:\n          type: number\n          example: 2000\n    Order:\n      type: object\n      properties:\n        pairId:\n          type: number\n          example: 2\n        sideId:\n          type: number\n          example: 2\n        timeInForceTypeId:\n          type: number\n          example: 3\n        expiryUtc:\n          type: date-time\n          example: null\n        typeId:\n          type: number\n          example: 2\n        price:\n          type: number\n          example: 1.2\n        qty:\n          type: number\n          example: 2000\n        userId:\n          type: number\n          example: 2634\n        accountAddress:\n          type: number\n          example: 0xA35AbBF38195f5CE301bD1A8C1d72809af01fC86\n        tradeFee:\n          type: number\n          example: 5\n        processed:\n          type: number\n          example: 0\n        statusId:\n          type: number\n          example: 14\n        sourceId:\n          type: number\n          example: 1\n        createdAtUtc:\n          type: date-time\n          example: 2022-04-27T14:38:36.000Z\n        lastActionAtUtc:\n          type: date-time\n          example: 2022-04-27T14:38:36.000Z\n        fixClientOrderId:\n          type: number\n          example: null\n        id:\n          type: number\n          example: 21403"
+      },
+      "BalanceType": {
+        "properties": {
+          "type": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "BalanceType.type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false,
+        "title": "BalanceType",
+        "type": "object"
+      },
+      "UserBalance": {
+        "properties": {
+          "openBalance": {
+            "title": "UserBalance.openBalance",
+            "type": "number"
+          },
+          "currentBalance": {
+            "title": "UserBalance.currentBalance",
+            "type": "number"
+          }
+        },
+        "required": [
+          "openBalance",
+          "currentBalance"
+        ],
+        "additionalProperties": false,
+        "title": "UserBalance",
+        "type": "object"
+      },
+      "OpenBalance": {
+        "properties": {
+          "openOrderAmount": {
+            "title": "OpenBalance.openOrderAmount",
+            "type": "number"
+          },
+          "openOrderToken": {
+            "title": "OpenBalance.openOrderToken",
+            "type": "number"
+          },
+          "openRFQAmount": {
+            "title": "OpenBalance.openRFQAmount",
+            "type": "number"
+          },
+          "pendingTransactionAmount": {
+            "title": "OpenBalance.pendingTransactionAmount",
+            "type": "number"
+          },
+          "pendingTransactionToken": {
+            "title": "OpenBalance.pendingTransactionToken",
+            "type": "number"
+          }
+        },
+        "required": [
+          "openOrderAmount",
+          "openOrderToken",
+          "openRFQAmount",
+          "pendingTransactionAmount",
+          "pendingTransactionToken"
+        ],
+        "additionalProperties": false,
+        "title": "OpenBalance",
+        "type": "object"
+      },
+      "OrderStatus": {
+        "enum": [
+          "opened",
+          "closed",
+          "all"
+        ],
+        "title": "OrderStatus",
+        "type": "string"
+      },
+      "Orders": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Order",
+              "title": "Orders.items.[]"
+            },
+            "title": "Orders.items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Orders.total",
+            "type": "number"
+          },
+          "totalPage": {
+            "title": "Orders.totalPage",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "totalPage"
+        ],
+        "additionalProperties": false,
+        "title": "Orders",
+        "type": "object"
+      },
+      "TradeStatus": {
+        "title": "TradeStatus",
+        "description": "@swagger components:\n  schemas:\n    Sides:\n      type: object\n      properties:\n        sideId:\n           type: string\n           example: BUY\n    TradeFee:\n      type: object\n      properties:\n        fee:\n           type: number\n           example: 5",
+        "enum": [
+          "confirmed"
+        ],
+        "type": "string"
+      },
+      "TradeType": {
+        "enum": [
+          "BUY",
+          "SELL"
+        ],
+        "title": "TradeType",
+        "type": "string"
+      },
+      "Trades": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Trade",
+              "title": "Trades.items.[]"
+            },
+            "title": "Trades.items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Trades.total",
+            "type": "number"
+          },
+          "totalPage": {
+            "title": "Trades.totalPage",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "totalPage"
+        ],
+        "additionalProperties": false,
+        "title": "Trades",
+        "type": "object"
+      },
+      "Trade": {
+        "properties": {
+          "id": {
+            "title": "Trade.id",
+            "type": "string"
+          },
+          "price": {
+            "title": "Trade.price",
+            "type": "number"
+          },
+          "qty": {
+            "title": "Trade.qty",
+            "type": "number"
+          },
+          "createdAtUtc": {
+            "title": "Trade.createdAtUtc",
+            "type": "string"
+          },
+          "transactionId": {
+            "title": "Trade.transactionId",
+            "type": "number"
+          },
+          "__makerOrder__": {
+            "$ref": "#/components/schemas/Order",
+            "title": "Trade.__makerOrder__"
+          },
+          "__takerOrder__": {
+            "$ref": "#/components/schemas/Order",
+            "title": "Trade.__takerOrder__"
+          },
+          "__transaction__": {
+            "$ref": "#/components/schemas/Transaction",
+            "title": "Trade.__transaction__"
+          }
+        },
+        "required": [
+          "id",
+          "price",
+          "qty",
+          "createdAtUtc",
+          "transactionId",
+          "__makerOrder__",
+          "__takerOrder__",
+          "__transaction__"
+        ],
+        "additionalProperties": false,
+        "title": "Trade",
+        "type": "object"
+      },
+      "OrderSide": {
+        "properties": {
+          "name": {
+            "title": "OrderSide.name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "title": "OrderSide",
+        "type": "object"
+      },
+      "Pair": {
+        "properties": {
+          "id": {
+            "title": "Pair.id",
+            "type": "number"
+          },
+          "name": {
+            "title": "Pair.name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "title": "Pair",
+        "type": "object"
+      },
+      "Transaction": {
+        "properties": {
+          "id": {
+            "title": "Transaction.id",
+            "type": "number"
+          },
+          "apiAuditLogId": {
+            "title": "Transaction.apiAuditLogId",
+            "nullable": true
+          },
+          "exchangeTxType": {
+            "title": "Transaction.exchangeTxType",
+            "type": "string"
+          },
+          "scMethod": {
+            "title": "Transaction.scMethod",
+            "type": "string"
+          },
+          "txParams": {
+            "title": "Transaction.txParams",
+            "type": "string"
+          },
+          "txFromAccountAddress": {
+            "title": "Transaction.txFromAccountAddress",
+            "type": "string"
+          },
+          "txToAccountAddress": {
+            "title": "Transaction.txToAccountAddress",
+            "type": "string"
+          },
+          "txNonce": {
+            "title": "Transaction.txNonce",
+            "type": "string"
+          },
+          "txSignerAddress": {
+            "title": "Transaction.txSignerAddress",
+            "type": "string"
+          },
+          "txGasPriceMwei": {
+            "title": "Transaction.txGasPriceMwei",
+            "type": "string"
+          },
+          "txGasLimitMwei": {
+            "title": "Transaction.txGasLimitMwei",
+            "type": "string"
+          },
+          "txNodeProviderUrl": {
+            "title": "Transaction.txNodeProviderUrl",
+            "type": "string"
+          },
+          "txHash": {
+            "title": "Transaction.txHash",
+            "type": "string"
+          },
+          "txSentAt": {
+            "title": "Transaction.txSentAt",
+            "type": "string"
+          },
+          "txHashAt": {
+            "title": "Transaction.txHashAt",
+            "type": "string"
+          },
+          "txConfirmedAt": {
+            "title": "Transaction.txConfirmedAt",
+            "type": "string"
+          },
+          "txErrorAt": {
+            "title": "Transaction.txErrorAt",
+            "nullable": true
+          },
+          "txErrorMessage": {
+            "title": "Transaction.txErrorMessage",
+            "nullable": true
+          },
+          "txStatus": {
+            "title": "Transaction.txStatus",
+            "type": "string"
+          },
+          "txBlockNumber": {
+            "title": "Transaction.txBlockNumber",
+            "type": "string"
+          },
+          "txGasCostMwei": {
+            "title": "Transaction.txGasCostMwei",
+            "type": "string"
+          },
+          "dependsOnTransactionId": {
+            "title": "Transaction.dependsOnTransactionId",
+            "nullable": true
+          },
+          "parentTransactionId": {
+            "title": "Transaction.parentTransactionId",
+            "nullable": true
+          },
+          "createdAt": {
+            "title": "Transaction.createdAt",
+            "type": "string"
+          },
+          "txGasUsedMwei": {
+            "title": "Transaction.txGasUsedMwei",
+            "type": "string"
+          },
+          "comments": {
+            "title": "Transaction.comments",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "apiAuditLogId",
+          "exchangeTxType",
+          "scMethod",
+          "txParams",
+          "txFromAccountAddress",
+          "txToAccountAddress",
+          "txNonce",
+          "txSignerAddress",
+          "txGasPriceMwei",
+          "txGasLimitMwei",
+          "txNodeProviderUrl",
+          "txHash",
+          "txSentAt",
+          "txHashAt",
+          "txConfirmedAt",
+          "txErrorAt",
+          "txErrorMessage",
+          "txStatus",
+          "txBlockNumber",
+          "txGasCostMwei",
+          "dependsOnTransactionId",
+          "parentTransactionId",
+          "createdAt",
+          "txGasUsedMwei",
+          "comments"
+        ],
+        "additionalProperties": false,
+        "title": "Transaction",
+        "type": "object"
+      },
+      "OrderBook": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderBookItem",
+              "title": "OrderBook.items.[]"
+            },
+            "title": "OrderBook.items",
+            "type": "array"
+          },
+          "total": {
+            "items": {
+              "title": "OrderBook.total.[]",
+              "type": "number"
+            },
+            "title": "OrderBook.total",
+            "type": "array"
+          },
+          "sides": {
+            "$ref": "#/components/schemas/Sides",
+            "title": "OrderBook.sides"
+          },
+          "lastTradedPrice": {
+            "title": "OrderBook.lastTradedPrice",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "sides",
+          "lastTradedPrice"
+        ],
+        "additionalProperties": false,
+        "title": "OrderBook",
+        "type": "object"
+      },
+      "OrderBookItem": {
+        "properties": {
+          "side_id": {
+            "title": "OrderBookItem.side_id",
+            "type": "number"
+          },
+          "price": {
+            "title": "OrderBookItem.price",
+            "type": "number"
+          },
+          "qty": {
+            "title": "OrderBookItem.qty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "side_id",
+          "price",
+          "qty"
+        ],
+        "additionalProperties": false,
+        "title": "OrderBookItem",
+        "type": "object"
+      },
+      "TradeTokenPrice": {
+        "properties": {
+          "marketPrice": {
+            "title": "TradeTokenPrice.marketPrice",
+            "type": "number"
+          },
+          "settlementPrice": {
+            "title": "TradeTokenPrice.settlementPrice",
+            "type": "number"
+          }
+        },
+        "required": [
+          "marketPrice",
+          "settlementPrice"
+        ],
+        "additionalProperties": false,
+        "title": "TradeTokenPrice",
+        "type": "object"
+      },
+      "Watchlist": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WatchlistItem",
+              "title": "Watchlist.items.[]"
+            },
+            "title": "Watchlist.items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Watchlist.total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "additionalProperties": false,
+        "title": "Watchlist",
+        "type": "object"
+      },
+      "WatchlistItem": {
+        "properties": {
+          "pairId": {
+            "title": "WatchlistItem.pairId",
+            "type": "number"
+          },
+          "lastTradedPrice": {
+            "title": "WatchlistItem.lastTradedPrice",
+            "type": "number"
+          },
+          "lastBidPrice": {
+            "title": "WatchlistItem.lastBidPrice",
+            "type": "number"
+          },
+          "lastBidVolume": {
+            "title": "WatchlistItem.lastBidVolume",
+            "type": "number"
+          },
+          "lastAskPrice": {
+            "title": "WatchlistItem.lastAskPrice",
+            "type": "number"
+          },
+          "lastAskVolume": {
+            "title": "WatchlistItem.lastAskVolume",
+            "type": "number"
+          },
+          "volume": {
+            "title": "WatchlistItem.volume",
+            "nullable": true,
+            "type": "number"
+          },
+          "value": {
+            "title": "WatchlistItem.value",
+            "nullable": true,
+            "type": "number"
+          },
+          "highPrice": {
+            "title": "WatchlistItem.highPrice",
+            "nullable": true,
+            "type": "number"
+          },
+          "lowPrice": {
+            "title": "WatchlistItem.lowPrice",
+            "nullable": true,
+            "type": "number"
+          },
+          "avgPrice": {
+            "title": "WatchlistItem.avgPrice",
+            "nullable": true,
+            "type": "number"
+          },
+          "lastTimestampUtc": {
+            "title": "WatchlistItem.lastTimestampUtc",
+            "type": "string"
+          },
+          "previousClosingPrice": {
+            "title": "WatchlistItem.previousClosingPrice",
+            "nullable": true
+          },
+          "__xPair__": {
+            "$ref": "#/components/schemas/XPair",
+            "title": "WatchlistItem.__xPair__"
+          }
+        },
+        "required": [
+          "pairId",
+          "lastTradedPrice",
+          "lastBidPrice",
+          "lastBidVolume",
+          "lastAskPrice",
+          "lastAskVolume",
+          "volume",
+          "value",
+          "highPrice",
+          "lowPrice",
+          "avgPrice",
+          "lastTimestampUtc",
+          "previousClosingPrice",
+          "__xPair__"
+        ],
+        "additionalProperties": false,
+        "title": "WatchlistItem",
+        "type": "object"
+      },
+      "XPair": {
+        "properties": {
+          "id": {
+            "title": "XPair.id",
+            "type": "number"
+          },
+          "name": {
+            "title": "XPair.name",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "XPair.symbol",
+            "type": "string"
+          },
+          "description": {
+            "title": "XPair.description",
+            "nullable": true
+          },
+          "categoryId": {
+            "title": "XPair.categoryId",
+            "type": "number"
+          },
+          "tradeable": {
+            "title": "XPair.tradeable",
+            "type": "number"
+          },
+          "showInWatchlist": {
+            "title": "XPair.showInWatchlist",
+            "type": "number"
+          },
+          "createdAtUtc": {
+            "title": "XPair.createdAtUtc",
+            "type": "string"
+          },
+          "quoteAssetId": {
+            "title": "XPair.quoteAssetId",
+            "type": "number"
+          },
+          "baseAssetId": {
+            "title": "XPair.baseAssetId",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "symbol",
+          "description",
+          "categoryId",
+          "tradeable",
+          "showInWatchlist",
+          "createdAtUtc",
+          "quoteAssetId",
+          "baseAssetId"
+        ],
+        "additionalProperties": false,
+        "title": "XPair",
+        "type": "object"
+      }
+    }
+  },
+  "tags": []
+}
